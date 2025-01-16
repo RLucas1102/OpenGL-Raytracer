@@ -1,0 +1,3 @@
+This week we will be looking into depth testing and stencil testing. I will implement a few toy examples utilizing the information from these chapters.
+
+Notes:
