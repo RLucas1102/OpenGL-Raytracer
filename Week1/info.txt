@@ -1,3 +1,32 @@
-This week we will be looking into depth testing and stencil testing. I will implement a few toy examples utilizing the information from these chapters.
+This week we will be looking into depth testing and 
+stencil testing. I will implement a few toy examples 
+utilizing the information from these chapters.
 
 Notes:
+
+* A depth buffer prevents triangles from rendering in front of 
+when they should be behind. 
+    * OpenGL tests the depth val of a frag against the
+    content stored in the depth buffer.
+    * Successful test: Fragment is rendered and buffer is updated
+    * Failed test: Fragment is discarded
+* Stores information per fragment
+* Most systems have depth buffer with a precision of 24 bits
+    * 16, 24, and 32 bit depth values exist
+* Depth testing is done after the fragment shader and stencil test
+    * gl_FragCoord is accessible and defined by glViewport
+        * screen-space coordinated ([0,0] is bottom left corner)
+        * the z-component is the depth value and is used to
+        compate the depth buffer's content
+    * Early depth testing is done before the fragment shader
+    and a depth value should not be written.
+        * Useful for when fragments will clearly not be seen.
+* Depth testing is enabled by glEnable(GL_DEPTH_TEST);
+    * OpenGL will automatically store the z-values if passed
+    and not if failed
+    * As we clear the color buffer, we should clear the depth 
+    buffer, or we will be stuck with the previous frame values
+    * Scenarios where we want to depth test all fragments, 
+    discard accordingly, and not update the buffer.
+        * We create a temporary read-only buffer
+        * OpenGL allows this through glDepthMask(GL_FALSE);
