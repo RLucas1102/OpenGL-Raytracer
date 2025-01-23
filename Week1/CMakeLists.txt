@@ -11,6 +11,13 @@ add_executable(cmake_test
     src/glad.c
 )
 
+add_custom_command(
+         TARGET cmake_test POST_BUILD
+         COMMAND ${CMAKE_COMMAND} -E copy_directory              
+            ${CMAKE_SOURCE_DIR}/files $<TARGET_FILE_DIR:cmake_test>/files
+         COMMENT "Copying shaders" VERBATIM
+         )
+
 target_include_directories(cmake_test PRIVATE "D:/Projects/CSCI471/include")
 
 target_link_libraries(cmake_test ${GLFW3_LIBRARY} OpenGL::GL)
