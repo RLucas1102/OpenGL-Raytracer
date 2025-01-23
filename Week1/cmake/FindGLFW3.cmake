@@ -22,6 +22,8 @@ set( _glfw3_HEADER_SEARCH_DIRS
 set( _glfw3_LIB_SEARCH_DIRS
 "/usr/lib"
 "/usr/local/lib"
+"/opt/local/include"
+"../include"
 "${CMAKE_SOURCE_DIR}/lib"
 "D:/Projects/CSCI471/lib/lib-mingw-w64" )
 
