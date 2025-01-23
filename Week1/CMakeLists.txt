@@ -12,11 +12,11 @@ add_executable(cmake_test
 )
 
 add_custom_command(
-         TARGET cmake_test POST_BUILD
-         COMMAND ${CMAKE_COMMAND} -E copy_directory              
-            ${CMAKE_SOURCE_DIR}/files $<TARGET_FILE_DIR:cmake_test>/files
-         COMMENT "Copying shaders" VERBATIM
-         )
+    TARGET cmake_test POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory              
+    ${CMAKE_SOURCE_DIR}/files $<TARGET_FILE_DIR:cmake_test>/files
+    COMMENT "Copying shaders" VERBATIM
+)
 
 target_include_directories(cmake_test PRIVATE "D:/Projects/CSCI471/include")
 
