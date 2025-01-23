@@ -18,7 +18,7 @@ set( _glfw3_HEADER_SEARCH_DIRS
 "/usr/include"
 "/usr/local/include"
 "${CMAKE_SOURCE_DIR}/includes"
-"D:/Projects/CSCI471/include" )
+"D:/Projects/CSCI471/CSCI471-LucasRobenolt-Spring2025/include" )
 set( _glfw3_LIB_SEARCH_DIRS
 "/usr/lib"
 "/usr/local/lib"
