@@ -15,17 +15,19 @@
 # Cmake file from: https://github.com/daw42/glslcookbook
 
 set( _glfw3_HEADER_SEARCH_DIRS
-"/usr/include"
-"/usr/local/include"
-"${CMAKE_SOURCE_DIR}/includes"
-"D:/Projects/CSCI471/CSCI471-LucasRobenolt-Spring2025/include" )
+  "/usr/include"
+  "/usr/local/include"
+  "${CMAKE_SOURCE_DIR}/includes"
+  "/opt/local/include"
+  "../include"
+  "D:/Projects/CSCI471/CSCI471-LucasRobenolt-Spring2025/include" )
 set( _glfw3_LIB_SEARCH_DIRS
-"/usr/lib"
-"/usr/local/lib"
-"/opt/local/include"
-"../include"
-"${CMAKE_SOURCE_DIR}/lib"
-"D:/Projects/CSCI471/lib/lib-mingw-w64" )
+  "/usr/lib"
+  "/usr/local/lib"
+  "/opt/local/include"
+  "../include"
+  "${CMAKE_SOURCE_DIR}/lib"
+  "D:/Projects/CSCI471/lib/lib-mingw-w64" )
 
 # Check environment for root search directory
 set( _glfw3_ENV_ROOT $ENV{GLFW3_ROOT} )
