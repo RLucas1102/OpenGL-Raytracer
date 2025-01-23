@@ -187,7 +187,7 @@ int main() {
         // Projection matrix
 	    // Our projection rarely changes, thus it can be kept outside the main render loop and set only once
 	    glm::mat4 projection; // Create a perspective matrix based on input parameters
-	    projection = glm::perspective(glm::radians(45.0f), 800.0f / 800.0f, 0.1f, 100.0f);
+	    projection = glm::perspective(glm::radians(45.0f), 800.0f / 800.0f, 2.0f, 100.0f);
 
         // View matrix
         glm::mat4 view;
