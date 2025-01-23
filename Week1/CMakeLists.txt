@@ -18,7 +18,6 @@ add_custom_command(
     COMMENT "Copying shaders" VERBATIM
 )
 
-#target_include_directories(cmake_test PRIVATE "D:/Projects/CSCI471/CSCI471-LucasRobenolt-Spring2025/include")
 target_include_directories(cmake_test PRIVATE "../include")
 
 target_link_libraries(cmake_test ${GLFW3_LIBRARY} OpenGL::GL)
