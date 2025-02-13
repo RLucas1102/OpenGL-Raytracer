@@ -1,0 +1,9 @@
+# Vscode config files
+/.vscode
+
+# Executable files
+*.exe
+test
+
+# Object files
+*.o
