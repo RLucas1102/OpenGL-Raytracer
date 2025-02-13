@@ -18,9 +18,9 @@ int main() {
 
     for (int i = 0; i < img_height; i++) {
         for (int j = 0; j < img_width; j++) {
-            auto r = double(j) / (img_width-1);
-            auto g = double(i) / (img_height-1);
-            auto b = double(i) / (img_height-1);
+            double r = double(j) / (img_width-1);
+            double g = double(i) / (img_height-1);
+            double b = double(i) / (img_height-1);
 
             int ir = int(255.999 * r);
             int ig = int(255.999 * g);
