@@ -1,4 +1,4 @@
-objects := vecTest.o
+objects := main.o
 src := ./src
 inc := ../include
 program := test
@@ -17,3 +17,4 @@ $(objects): %.o : $(src)/%.cpp
 clean:
 	rm -f *.o
 	rm -f test
+	rm *.ppm
