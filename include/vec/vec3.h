@@ -37,6 +37,42 @@ class vec3
         
         void setZ(float z) { _z = z; }
         
+        // Vector Arithmetic
+        // -----------------
+        vec3 negate() const {
+            return vec3(-_x, -_y, -_z);
+        }
+
+        void add(const vec3& v) {
+            _x += v.getX();
+            _y += v.getY();
+            _z += v.getZ();
+        }
+        
+        void subtract(const vec3& v) {
+            _x -= v.getX();
+            _y -= v.getY();
+            _z -= v.getZ();
+        }
+        
+        void multiply(float scalar) {
+            _x *= scalar;
+            _y *= scalar;
+            _z *= scalar;
+        }
+
+        float dot(const vec3& v) const {
+            return    (_x * v.getX()) 
+                    + (_y * v.getY())
+                    + (_z * v.getZ());
+        }
+        
+        vec3 cross(const vec3& v) const {
+            return vec3(((_y * v.getZ()) - (_z * v.getY())), 
+                        ((_z * v.getX()) - (_x * v.getZ())),
+                        ((_x * v.getY()) - (_y * v.getX())));
+        }
+
         // Other useful member functions
         // -----------------------------
         vec3 normalize() const {
@@ -55,10 +91,6 @@ class vec3
 
         float length_squared() const {
             return (_x * _x) + (_y * _y) + (_z * _z);
-        }
-
-        vec3 negate() {
-            return vec3(-_x, -_y, -_z);
         }
 
         void print() {
