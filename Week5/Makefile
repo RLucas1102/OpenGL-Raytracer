@@ -1,4 +1,4 @@
-objects := main.o
+objects := vecTest.o
 src := ./src
 inc := ../include
 program := test

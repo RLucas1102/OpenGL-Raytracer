@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vec/vec3.h>
+#include <vec/ray.h>
 
 int main() {
 
@@ -46,6 +47,15 @@ int main() {
     std::cout << "V: ";
     V.print();
 
+    float t = 2;
+    vec3 origin(4,2,0);
+    vec3 direction(-1, 2, 0);
+
+    ray F(origin, direction);
+
+    F.getOrigin().print();
+    F.getDirection().print();
+    F.at(t).print();
 
     return 0;
 }
