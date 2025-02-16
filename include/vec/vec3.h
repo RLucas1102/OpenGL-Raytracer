@@ -36,45 +36,13 @@ class vec3
         void setY(float y) { _y = y; }
         
         void setZ(float z) { _z = z; }
-        
-        // Vector Arithmetic
-        // -----------------
+
+        // Other useful member functions
+        // -----------------------------
         vec3 negate() const {
             return vec3(-_x, -_y, -_z);
         }
 
-        void add(const vec3& v) {
-            _x += v.getX();
-            _y += v.getY();
-            _z += v.getZ();
-        }
-        
-        void subtract(const vec3& v) {
-            _x -= v.getX();
-            _y -= v.getY();
-            _z -= v.getZ();
-        }
-        
-        void multiply(float scalar) {
-            _x *= scalar;
-            _y *= scalar;
-            _z *= scalar;
-        }
-
-        float dot(const vec3& v) const {
-            return    (_x * v.getX()) 
-                    + (_y * v.getY())
-                    + (_z * v.getZ());
-        }
-        
-        vec3 cross(const vec3& v) const {
-            return vec3(((_y * v.getZ()) - (_z * v.getY())), 
-                        ((_z * v.getX()) - (_x * v.getZ())),
-                        ((_x * v.getY()) - (_y * v.getX())));
-        }
-
-        // Other useful member functions
-        // -----------------------------
         vec3 normalize() const {
             float vec_length = this->length();
 
@@ -98,5 +66,31 @@ class vec3
         }
 
 };
+
+// Vector Arithmetic
+// -----------------
+inline vec3 add(const vec3& u, const vec3& v) {
+    return vec3(u.getX() + v.getX(), u.getY() + v.getY(), u.getZ() + v.getZ());
+}
+        
+inline vec3 subtract(const vec3& u, const vec3& v) {
+    return vec3(u.getX() - v.getX(), u.getY() - v.getY(), u.getZ() - v.getZ());
+}
+        
+inline vec3 multiply(const vec3& u, float scalar) {
+    return vec3(u.getX() * scalar, u.getY() * scalar, u.getZ() * scalar);
+}
+
+inline float dot(const vec3& u, const vec3& v) {
+    return    (u.getX() * v.getX()) 
+            + (u.getY() * v.getY())
+            + (u.getZ() * v.getZ());
+}
+        
+inline vec3 cross(const vec3& u, const vec3& v) {
+    return vec3(((u.getY() * v.getZ()) - (u.getZ() * v.getY())), 
+                ((u.getZ() * v.getX()) - (u.getX() * v.getZ())),
+                ((u.getX() * v.getY()) - (u.getY() * v.getX())));
+}
 
 #endif

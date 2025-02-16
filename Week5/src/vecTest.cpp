@@ -27,21 +27,24 @@ int main() {
     U.normalize().print();
 
     std::cout << "U + V: ";
-    U.add(V);
-    U.print();
+    add(U, V).print();
 
     std::cout << "U - V: ";
-    U.subtract(V);
-    U.print();
+    subtract(U, V).print();
 
     std::cout << "5 * U: ";
-    U.multiply(5);
-    U.print();
+    multiply(U, 5).print();
 
-    std::cout << "U . V: " << U.dot(V) << std::endl;
+    std::cout << "U . V: " << dot(U, V) << std::endl;
 
     std::cout << "U x V: ";
-    U.cross(V).print();
+    cross(U, V).print();
+
+    std::cout << "U: ";
+    U.print();
+
+    std::cout << "V: ";
+    V.print();
 
 
     return 0;
