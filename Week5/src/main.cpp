@@ -7,7 +7,9 @@
 // ----------
 void writeColor(std::ofstream& outputFile, const vec3& pixel_color);
 
-vec3 ray_color(const ray& r);
+vec3 rayColor(const ray& r);
+
+bool hitSphere(const vec3& center, float radius, const ray& r);
 
 int main() {
 
@@ -74,7 +76,7 @@ int main() {
             ray r(camera_center, ray_dir);
 
             // Send pixel color to file for output
-            vec3 pixel_color = ray_color(r);
+            vec3 pixel_color = rayColor(r);
             writeColor(myFile, pixel_color);
 
         }
@@ -103,11 +105,25 @@ void writeColor(std::ofstream& outputFile, const vec3& pixel_color) {
 
 }
 
-vec3 ray_color(const ray &r)
+vec3 rayColor(const ray& r)
 {
+    if(hitSphere(vec3(0, 0, -1), 0.5, r)) {
+        return vec3(1,0,0);
+    }
+
     // Fade from color2 to color1 in the vertical y direction
     float alpha = 0.5 * (r.getDirection().getY() + 1.0);
     vec3 color1(1, 1, 1);
     vec3 color2(0.3, 0.5, 1.0);
     return add(multiply(color1, (1.0 - alpha)), multiply(color2, alpha));
+}
+
+bool hitSphere(const vec3& center, float radius, const ray& r)
+{
+    vec3 CQ = subtract(center, r.getOrigin());
+    float a = dot(r.getDirection(), r.getDirection());
+    float b = -2.0 * dot(r.getDirection(), CQ);
+    float c = dot(CQ, CQ) - radius * radius;
+    float discriminant = b*b - 4*a*c;
+    return (discriminant >= 0);
 }
