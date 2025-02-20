@@ -7,3 +7,6 @@ test
 
 # Object files
 *.o
+
+# Image files
+*.ppm
