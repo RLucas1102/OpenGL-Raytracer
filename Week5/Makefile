@@ -1,9 +1,9 @@
-objects := vecTest.o
+objects := main.o
 src := ./src
 inc := ../include
 program := test
 
-CFLAGS = -I$(inc)
+CFLAGS = -I$(inc) -ggdb
 
 all: $(program)
 
