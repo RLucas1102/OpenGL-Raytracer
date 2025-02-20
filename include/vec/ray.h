@@ -46,7 +46,7 @@ class ray
 		// Useful functions
 		// ----------------
 		vec3 at(float t) {
-			return add(_org, multiply(_dir, t));
+			return add(_org, multiply(_dir, t)); // P(t) = A + tb
 		}
 
 };
