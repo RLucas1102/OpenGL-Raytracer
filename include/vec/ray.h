@@ -19,7 +19,7 @@ class ray
 		ray(const vec3& origin, const vec3& direction) {
 
 			_org = origin;
-			_dir = direction.normalize();
+			_dir = direction;
 
 		}
 
@@ -40,12 +40,12 @@ class ray
 		} 
 
 		void setDirection(const vec3& direction) {
-			_dir = direction.normalize();
+			_dir = direction;
 		}
 
 		// Useful functions
 		// ----------------
-		vec3 at(float t) {
+		vec3 at(float t) const {
 			return add(_org, multiply(_dir, t)); // P(t) = A + tb
 		}
 
