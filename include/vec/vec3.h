@@ -43,16 +43,6 @@ class vec3
             return vec3(-_x, -_y, -_z);
         }
 
-        vec3 normalize() const {
-            float vec_length = this->length();
-
-            float norm_x = _x / vec_length;
-            float norm_y = _y / vec_length;
-            float norm_z = _z / vec_length;
-
-            return vec3(norm_x, norm_y, norm_z);
-        }
-
         float length() const {
             return std::sqrt(this->length_squared());
         }
@@ -91,6 +81,16 @@ inline vec3 cross(const vec3& u, const vec3& v) {
     return vec3(((u.getY() * v.getZ()) - (u.getZ() * v.getY())), 
                 ((u.getZ() * v.getX()) - (u.getX() * v.getZ())),
                 ((u.getX() * v.getY()) - (u.getY() * v.getX())));
+}
+
+inline vec3 normalize(const vec3& v) {
+    float vec_length = v.length();
+
+    float norm_x = v.getX() / vec_length;
+    float norm_y = v.getY() / vec_length;
+    float norm_z = v.getZ() / vec_length;
+
+    return vec3(norm_x, norm_y, norm_z);
 }
 
 #endif
