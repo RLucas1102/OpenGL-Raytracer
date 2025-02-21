@@ -9,7 +9,7 @@ void writeColor(std::ofstream& outputFile, const vec3& pixel_color);
 
 vec3 rayColor(const ray& r);
 
-bool hitSphere(const vec3& center, float radius, const ray& r);
+float hitSphere(const vec3& center, float radius, const ray& r);
 
 int main() {
 
@@ -105,25 +105,45 @@ void writeColor(std::ofstream& outputFile, const vec3& pixel_color) {
 
 }
 
+// Determine the pixel color that will be output based on ray intersection
+// Returns pixel_color
 vec3 rayColor(const ray& r)
 {
-    if(hitSphere(vec3(0, 0, -1), 0.5, r)) {
-        return vec3(1,0,0);
+    vec3 center = vec3(0,0,-1);
+    float radius = 0.5;
+    float t = hitSphere(center, radius, r); // Determine t value for ray intersection
+    
+    if(t > 0.0) {
+        vec3 N = normalize(subtract(r.at(t), center)); // Get normal of sphere at intersection point
+        return multiply(vec3(N.getX() + 1.0, N.getY() + 1.0, N.getZ() + 1.0), 0.5);
     }
 
     // Fade from color2 to color1 in the vertical y direction
-    float alpha = 0.5 * (r.getDirection().getY() + 1.0);
+    vec3 unit_direction = normalize(r.getDirection());
+    float alpha = 0.5 * (unit_direction.getY() + 1.0);
     vec3 color1(1, 1, 1);
     vec3 color2(0.3, 0.5, 1.0);
     return add(multiply(color1, (1.0 - alpha)), multiply(color2, alpha));
 }
 
-bool hitSphere(const vec3& center, float radius, const ray& r)
+
+// Find the t-value(s) where our ray, shooting from the screen, intersects our sphere
+// returns the t-value 
+float hitSphere(const vec3& center, float radius, const ray& r)
 {
     vec3 CQ = subtract(center, r.getOrigin());
     float a = dot(r.getDirection(), r.getDirection());
     float b = -2.0 * dot(r.getDirection(), CQ);
     float c = dot(CQ, CQ) - radius * radius;
     float discriminant = b*b - 4*a*c;
-    return (discriminant >= 0);
+    
+    float result;
+    if(discriminant < 0) {
+        result = -1.0;
+    }
+    else {
+        result = (-b - std::sqrt(discriminant))/(2.0*a);
+    }
+
+    return result;
 }
