@@ -13,7 +13,8 @@ using std::shared_ptr;
 
 class shape_list {
     private:
-        std::vector<shared_ptr<shape>> objects; // Main list to hold shapes
+        std::vector<shared_ptr<shape>> _objects; // Main list to hold shapes
+        shared_ptr<shape> _temp_object;
 
     public:
 
@@ -22,26 +23,32 @@ class shape_list {
         shape_list(shared_ptr<shape> object) { add(object); }
 
         // List functions
-        void clear() { objects.clear(); }
+        void clear() { _objects.clear(); }
 
         void add(shared_ptr<shape> object) {
-            objects.push_back(object);
+            _objects.push_back(object);
         }
 
         // For each object in the object list, see what is the closest object to camera
-        bool render(const ray& r, float ray_tmin, float ray_tmax) const {
+        bool render(const ray& r, float ray_tmin, float ray_tmax) {
             bool hitSuccess = false;
             float closest = ray_tmax;
 
-            for(const shared_ptr<shape>& object : objects) {
+            for(const shared_ptr<shape>& object : _objects) {
                 if(object->hit(r, ray_tmin, closest)) {
                     hitSuccess = true;
                     closest = object->getT();
+                    _temp_object = object;
                 }
             }
 
             return hitSuccess;
 
+        }
+
+        // Accessor
+        shared_ptr<shape> getTempObject() const {
+            return _temp_object;
         }
 
 
