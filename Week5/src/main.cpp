@@ -1,15 +1,29 @@
-#include <iostream>
 #include <vec/vec3.h>
 #include <vec/ray.h>
+#include <shape/sphere.h>
+#include <shape/shape.h>
+#include <shape/shape_list.h>
+
+#include <iostream>
+#include <memory>
+#include <vector>
+#include <limits>
+#include <cmath>
 #include <fstream>
+
+using std::make_shared;
+using std::shared_ptr;
+
+#define infinity std::numeric_limits<double>::infinity()
+#define pi 3.1415926535897932385
 
 // Prototypes
 // ----------
 void writeColor(std::ofstream& outputFile, const vec3& pixel_color);
 
-vec3 rayColor(const ray& r);
+vec3 rayColor(const ray& r, shape_list& world);
 
-float hitSphere(const vec3& center, float radius, const ray& r);
+float degreesToRadians(float degrees);
 
 int main() {
 
@@ -25,6 +39,12 @@ int main() {
         img_height = 1; 
 
     std::cout << "Img Dimensions: " << img_width << "x" << img_height << std::endl;
+
+    // World setup
+    shape_list world;
+
+    world.add(make_shared<sphere>(vec3(0,0,-1), 0.5));
+    world.add(make_shared<sphere>(vec3(0,-100.5,-1), 100));
 
     // Camera setup
     float focal_length = 1.0;
@@ -76,7 +96,7 @@ int main() {
             ray r(camera_center, ray_dir);
 
             // Send pixel color to file for output
-            vec3 pixel_color = rayColor(r);
+            vec3 pixel_color = rayColor(r, world);
             writeColor(myFile, pixel_color);
 
         }
@@ -107,43 +127,27 @@ void writeColor(std::ofstream& outputFile, const vec3& pixel_color) {
 
 // Determine the pixel color that will be output based on ray intersection
 // Returns pixel_color
-vec3 rayColor(const ray& r)
+vec3 rayColor(const ray &r, shape_list &world)
 {
-    vec3 center = vec3(0,0,-1);
-    float radius = 0.5;
-    float t = hitSphere(center, radius, r); // Determine t value for ray intersection
-    
-    if(t > 0.0) {
-        vec3 N = normalize(subtract(r.at(t), center)); // Get normal of sphere at intersection point
-        return multiply(vec3(N.getX() + 1.0, N.getY() + 1.0, N.getZ() + 1.0), 0.5);
-    }
+    vec3 result;
 
-    // Fade from color2 to color1 in the vertical y direction
-    vec3 unit_direction = normalize(r.getDirection());
-    float alpha = 0.5 * (unit_direction.getY() + 1.0);
-    vec3 color1(1, 1, 1);
-    vec3 color2(0.3, 0.5, 1.0);
-    return add(multiply(color1, (1.0 - alpha)), multiply(color2, alpha));
-}
-
-
-// Find the t-value(s) where our ray, shooting from the screen, intersects our sphere
-// returns the t-value 
-float hitSphere(const vec3& center, float radius, const ray& r)
-{
-    vec3 CQ = subtract(center, r.getOrigin());
-    float a = dot(r.getDirection(), r.getDirection());
-    float b = -2.0 * dot(r.getDirection(), CQ);
-    float c = dot(CQ, CQ) - radius * radius;
-    float discriminant = b*b - 4*a*c;
-    
-    float result;
-    if(discriminant < 0) {
-        result = -1.0;
+    if(world.render(r, 0, infinity)) {
+        vec3 white(1,1,1);
+        result = multiply(add(world.getTempObject()->getNormal(), white), 0.5); // 0.5 * (shape's normal + white(1,1,1))
     }
     else {
-        result = (-b - std::sqrt(discriminant))/(2.0*a);
+
+        vec3 unit_direction = normalize(r.getDirection());
+        float alpha = 0.5 * (unit_direction.getY() + 1.0);
+        vec3 color1(1, 1, 1);
+        vec3 color2(0.3, 0.5, 1.0);
+        result = add(multiply(color1, (1.0 - alpha)), multiply(color2, alpha));
     }
 
     return result;
+}
+
+float degreesToRadians(float degrees)
+{
+    return (degrees * pi) / 180.0;
 }
