@@ -25,7 +25,7 @@ int main() {
     U.negate().print();
 
     std::cout << "Normalize: ";
-    U.normalize().print();
+    normalize(U).print();
 
     std::cout << "U + V: ";
     add(U, V).print();
