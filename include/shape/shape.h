@@ -9,6 +9,7 @@ class shape {
         vec3 _hit_point;
         vec3 _normal;
         float _t;
+        bool _isFront;
 
     public:
         // Destructor
@@ -16,6 +17,22 @@ class shape {
 
         // Hit detection function (Will be different for every shape)
         virtual bool hit(const ray& r, float ray_tmin, float ray_tmax) = 0;
+
+        // Sets the shape's normal vector
+        // Outward_normal is assumed to be of unit length
+        void setFaceNormal(const ray& r, const vec3& outward_normal) {
+            if (dot(r.getDirection(), outward_normal) > 0.0) {
+                // Ray is intersecting from inside the shape
+                _normal = outward_normal.negate();
+                _isFront = false;
+            }
+            else {
+                // Ray is intersecting from outside the shape
+                _normal = outward_normal;
+                _isFront = true;
+            }
+
+        }
 
         // Accessors
         const vec3& getHitPoint() const { return _hit_point; }
