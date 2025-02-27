@@ -31,6 +31,7 @@ class sphere : public shape {
             else {
 
                 float t;
+                vec3 outward_normal;
 
                 t = (-b - std::sqrt(discriminant))/(2.0*a);
 
@@ -41,7 +42,8 @@ class sphere : public shape {
 
                 setT(t);
                 setHitPoint( r.at(t) );
-                setNormal( multiply(subtract(getHitPoint(), _center), 1/_radius) ); // _normal = (_hit_point - _center) / _radius
+                outward_normal = multiply(subtract(getHitPoint(), _center), 1/_radius);
+                setFaceNormal(r, outward_normal);
 
             }
         
