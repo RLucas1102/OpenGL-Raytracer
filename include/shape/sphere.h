@@ -1,6 +1,7 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
+#include <shape/interval.h>
 #include <shape/shape.h>
 #include <vec/vec3.h>
 #include <vec/ray.h>
@@ -15,7 +16,7 @@ class sphere : public shape {
         sphere(const vec3& center, float radius) : _center(center), _radius(std::fmax(0, radius)) {}
 
         //Implemented virtual functions
-        bool hit(const ray& r, float ray_tmin, float ray_tmax) override {
+        bool hit(const ray& r, interval ray_t) override {
             
             bool hitSuccess = true;
 
@@ -35,7 +36,7 @@ class sphere : public shape {
 
                 t = (-b - std::sqrt(discriminant))/(2.0*a);
 
-                if (t <= ray_tmin || t >= ray_tmax) {
+                if (!ray_t.surrounds(t)) {
                     t = (-b + std::sqrt(discriminant))/(2.0*a);
                     hitSuccess = false;
                 }

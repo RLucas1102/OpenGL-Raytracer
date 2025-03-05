@@ -1,6 +1,7 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 
+#include <shape/interval.h>
 #include <vec/vec3.h>
 #include <vec/ray.h>
 
@@ -16,7 +17,7 @@ class shape {
         virtual ~shape() = default;
 
         // Hit detection function (Will be different for every shape)
-        virtual bool hit(const ray& r, float ray_tmin, float ray_tmax) = 0;
+        virtual bool hit(const ray& r, interval ray_t) = 0;
 
         // Sets the shape's normal vector
         // Outward_normal is assumed to be of unit length

@@ -4,6 +4,7 @@
 #include <vec/vec3.h>
 #include <vec/ray.h>
 #include <shape/shape.h>
+#include <shape/interval.h>
 
 #include <memory>
 #include <vector>
@@ -30,12 +31,12 @@ class shape_list {
         }
 
         // For each object in the object list, see what is the closest object to camera
-        bool render(const ray& r, float ray_tmin, float ray_tmax) {
+        bool render(const ray& r, interval ray_t) {
             bool hitSuccess = false;
-            float closest = ray_tmax;
+            float closest = ray_t.getMax();
 
             for(const shared_ptr<shape>& object : _objects) {
-                if(object->hit(r, ray_tmin, closest)) {
+                if(object->hit(r, interval(ray_t.getMin(), closest))) {
                     hitSuccess = true;
                     closest = object->getT();
                     _temp_object = object;

@@ -20,12 +20,12 @@ class interval {
         interval(float min, float max) : _min(min), _max(max) {}
 
         // Accessors
-        float minValue() const { return _min; }
-        float maxValue() const { return _max; }
+        float getMin() const { return _min; }
+        float getMax() const { return _max; }
     
         // Mutators
-        void setMinValue(float value) { _min = value; }
-        void setMaxValue(float value) { _max = value; }
+        void setMin(float value) { _min = value; }
+        void setMax(float value) { _max = value; }
 
         // Other functions
         float size() const { return _max - _min; }

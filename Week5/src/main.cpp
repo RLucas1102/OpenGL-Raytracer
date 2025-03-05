@@ -3,6 +3,7 @@
 #include <shape/sphere.h>
 #include <shape/shape.h>
 #include <shape/shape_list.h>
+#include <shape/interval.h>
 
 #include <iostream>
 #include <memory>
@@ -131,7 +132,7 @@ vec3 rayColor(const ray &r, shape_list &world)
 {
     vec3 result;
 
-    if(world.render(r, 0, infinity)) {
+    if(world.render(r, interval(0, infinity))) {
         vec3 white(1,1,1);
         result = multiply(add(world.getTempObject()->getNormal(), white), 0.5); // 0.5 * (shape's normal + white(1,1,1))
     }
