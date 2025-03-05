@@ -31,7 +31,7 @@ class shape_list {
         }
 
         // For each object in the object list, see what is the closest object to camera
-        bool render(const ray& r, interval ray_t) {
+        bool hit(const ray& r, interval ray_t) {
             bool hitSuccess = false;
             float closest = ray_t.getMax();
 
