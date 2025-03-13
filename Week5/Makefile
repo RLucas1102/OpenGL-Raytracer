@@ -1,6 +1,6 @@
 objects := main.o
 src := ./src
-inc := ../include
+inc := ./inc
 program := test
 
 CFLAGS = -I$(inc) -ggdb

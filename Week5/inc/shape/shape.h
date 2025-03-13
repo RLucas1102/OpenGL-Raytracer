@@ -1,3 +1,17 @@
+/********************************************************************************
+ * Name: Lucas Robenolt
+ * 
+ * Last Updated: 3/12/2025
+ * 
+ * Email: robenoltl@gmail.com
+ *
+ * Purpose: This class is an abstract class for any derived classes that
+ *          represent a shape. The shape class is a general class to tracks hits
+ *          and face normals of shapes within the rendered scene. Simply, shapes
+ *          can just be something that are hit.
+ *          
+ ********************************************************************************/
+
 #ifndef SHAPE_H
 #define SHAPE_H
 
