@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include <ShaderLoader.h>
+
 // Callbacks
 void error_callback(int error, const char* description);
 static void esc_callback(GLFWwindow* MyWindow, int key, int scancode, int action, int mods); // Make local to this file
@@ -49,11 +51,80 @@ int main() {
         return 1;
     }
 
+    // Create Shader Program
+    Shader myShader("shaders/shader.vs", "shaders/shader.fs");
+
+    // Create vertex data (cube)
+    float vertices[] {
+        // Vertices
+         0.5f,  0.5f,  1.0f,
+        -0.5f,  0.5f,  1.0f,
+        -0.5f, -0.5f,  1.0f,
+         0.5f, -0.5f,  1.0f,
+         0.5f,  0.5f, -1.0f,
+        -0.5f,  0.5f, -1.0f,
+        -0.5f, -0.5f, -1.0f,
+         0.5f, -0.5f, -1.0f,
+    };
+
+    // Create index data
+    unsigned int indices[] {
+       // Front face
+       0, 1, 2,
+       0, 2, 3,
+       // Back face
+       5, 4, 6,
+       6, 4, 7,
+       // Top face
+       4, 5, 1,
+       4, 1, 0,
+       // Bottom face
+       7, 2, 6,
+       7, 3, 2,
+       // Left face
+       1, 5, 6,
+       1, 6, 2,
+       // Right face
+       0, 7, 4,
+       0, 3, 7
+    };
+
+    // Creating buffers and vertex array
+    unsigned int VBO, EBO, VAO;
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+    glGenVertexArrays(1, &VAO);
+
+    // Bind a vertex array; all subsequent VBOs and attributes will be bound to this object
+    glBindVertexArray(VAO);
+
+    // Bind array buffer type and then vertex data
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Bind element buffer type and then index data
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // Position attribute
+    // Index = 0
+    // Number of components = 3
+    // Type = GL_FLOAT
+    // Normalized = False
+    // Stride: 3 * 4 = 12 (Each vertex is 12 bytes apart)
+    // Offset: None
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // Offset: 3 * 4 = 12 (Each vertex is 12 bytes apart)
+    glEnableVertexAttribArray(0); // Enable vertex attribute 0
+
     // Render loop
     while (!glfwWindowShouldClose(window)) {
         
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set color to clear window with
         glClear(GL_COLOR_BUFFER_BIT); // Clear screen with color
+
+        myShader.use();
+
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window); // Swap front and back buffer
         glfwPollEvents(); // Process received events
@@ -92,6 +163,6 @@ void esc_callback(GLFWwindow *MyWindow, int key, int scancode, int action, int m
  */
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, 800, 800);
 }
 
