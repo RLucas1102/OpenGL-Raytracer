@@ -10,7 +10,7 @@ C_SOURCES := $(wildcard $(src)/*.c)
 C_OBJECTS := $(C_SOURCES:$(src)/%.c=%.o)
 
 CC = g++
-CFLAGS = -I $(inc)
+CFLAGS = -g -I $(inc)
 LFLAGS = $(lib)
 
 $(program) : $(CPP_OBJECTS) $(C_OBJECTS)
