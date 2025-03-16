@@ -2,8 +2,7 @@
 /.vscode
 
 # Executable files
-*.exe
-test
+*.out
 
 # Object files
 *.o
