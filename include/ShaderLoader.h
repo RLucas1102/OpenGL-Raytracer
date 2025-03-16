@@ -1,3 +1,18 @@
+/******************************************************************************
+ * Name:        Lucas Robenolt
+ * 
+ * Email:       robenoltl@gmail.com
+ * 
+ * Last Updated: 3/15/2025
+ * 
+ * Purpose:     This class is used to easily create shader programs by creating
+ *              a shader object that holds a shader program ID. A constructor 
+ *              that is passed the file paths of the vertex shader and fragment 
+ *              shader will compile and link a new shader program.
+ * 
+ ******************************************************************************/
+
+
 #ifndef SHADERLOADER_H
 #define SHADERLOADER_H
 
