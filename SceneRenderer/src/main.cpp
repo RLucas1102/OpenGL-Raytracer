@@ -3,6 +3,10 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <ShaderLoader.h>
 
 // Callbacks
@@ -116,14 +120,40 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // Offset: 3 * 4 = 12 (Each vertex is 12 bytes apart)
     glEnableVertexAttribArray(0); // Enable vertex attribute 0
 
+    // Create some variables to hold uniform locations in vertex shader
+    int modelLoc = glGetUniformLocation(myShader.ID, "model");
+    int viewLoc  = glGetUniformLocation(myShader.ID, "view");
+    int projLoc  = glGetUniformLocation(myShader.ID, "projection"); 
+
+    // Depth testing
+    glEnable(GL_DEPTH_TEST);
+
     // Render loop
     while (!glfwWindowShouldClose(window)) {
         
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set color to clear window with
-        glClear(GL_COLOR_BUFFER_BIT); // Clear screen with color
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen with color
 
         myShader.use();
 
+        // World 
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+
+        // Camera
+        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
+
+        // Projection
+        glm::mat4 projection = glm::mat4(1.0f);
+        projection = glm::perspective(glm::radians(45.0f), 800.0f/800.0f, 0.1f, 100.0f);
+
+        // Send matrices to vertex shader
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+        // Draw vertices
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window); // Swap front and back buffer
