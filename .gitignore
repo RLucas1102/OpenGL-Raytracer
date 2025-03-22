@@ -9,3 +9,6 @@
 
 # Image files
 *.ppm
+
+# Test .cpp files
+*Test.cpp
