@@ -56,19 +56,19 @@ int main() {
     }
 
     // Create Shader Program
-    Shader myShader("shaders/shader.vs", "shaders/shader.fs");
+    Shader myShader("shaders/shader.vs", "shaders/shader.gs", "shaders/shader.fs");
 
     // Create vertex data (cube)
     float vertices[] {
         // Vertices
-         0.5f,  0.5f,  1.0f,
+         0.5f,  0.5f,  1.0f,    
         -0.5f,  0.5f,  1.0f,
         -0.5f, -0.5f,  1.0f,
          0.5f, -0.5f,  1.0f,
          0.5f,  0.5f, -1.0f,
         -0.5f,  0.5f, -1.0f,
         -0.5f, -0.5f, -1.0f,
-         0.5f, -0.5f, -1.0f,
+         0.5f, -0.5f, -1.0f
     };
 
     // Create index data
@@ -138,11 +138,11 @@ int main() {
 
         // World 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.3f, 0.0f, 0.0f));
 
         // Camera
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
 
         // Projection
         glm::mat4 projection = glm::mat4(1.0f);
