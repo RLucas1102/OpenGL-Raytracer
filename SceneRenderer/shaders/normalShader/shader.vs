@@ -10,8 +10,13 @@ layout (std140) uniform matrices {
     
 };
 
+out VS_OUT {
+    mat4 projection;
+} vs_out;
+
 void main() {
 
-    gl_Position = projection * view * model * vec4(aPos, 1.0f);
+    gl_Position = view * model * vec4(aPos, 1.0f);
+    vs_out.projection = projection;
 
 }
