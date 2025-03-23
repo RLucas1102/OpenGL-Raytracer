@@ -55,20 +55,21 @@ int main() {
         return 1;
     }
 
-    // Create Shader Program
-    Shader myShader("shaders/shader.vs", "shaders/shader.gs", "shaders/shader.fs");
+    // Create Shader Programs
+    Shader normalShader("shaders/normalShader/shader.vs", "shaders/normalShader/shader.gs", "shaders/normalShader/shader.fs");
+    Shader lightShader("shaders/lightShader/shader.vs", "shaders/lightShader/shader.fs");
 
     // Create vertex data (cube)
     float vertices[] {
         // Vertices
-         0.5f,  0.5f,  1.0f,    
-        -0.5f,  0.5f,  1.0f,
-        -0.5f, -0.5f,  1.0f,
-         0.5f, -0.5f,  1.0f,
-         0.5f,  0.5f, -1.0f,
-        -0.5f,  0.5f, -1.0f,
-        -0.5f, -0.5f, -1.0f,
-         0.5f, -0.5f, -1.0f
+         0.5f,  0.5f,  0.5f,    
+        -0.5f,  0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f,  0.5f, -0.5f,
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f
     };
 
     // Create index data
@@ -120,10 +121,28 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // Offset: 3 * 4 = 12 (Each vertex is 12 bytes apart)
     glEnableVertexAttribArray(0); // Enable vertex attribute 0
 
-    // Create some variables to hold uniform locations in vertex shader
-    int modelLoc = glGetUniformLocation(myShader.ID, "model");
-    int viewLoc  = glGetUniformLocation(myShader.ID, "view");
-    int projLoc  = glGetUniformLocation(myShader.ID, "projection"); 
+    glBindVertexArray(0);
+
+    // Create uniform buffer for matrices in vertex shader (Both normalShader and lightShader use all three matrices)
+    // Create buffer and generate ID
+    unsigned int UBO;       
+    glGenBuffers(1, &UBO);
+
+    // Get Uniform block location
+    unsigned int normalBlockIdx = glGetUniformBlockIndex(normalShader.ID, "Matrices");
+    unsigned int lightBlockIdx = glGetUniformBlockIndex(lightShader.ID, "Matrices");
+
+    // Bind each shaders uniform block to the binding point 0
+    glUniformBlockBinding(normalShader.ID, normalBlockIdx, 0);
+    glUniformBlockBinding(lightShader.ID, lightBlockIdx, 0);
+
+    // Bind UBO and reserve space for 3 4x4 matrices in the uniform buffer object
+    glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+    glBufferData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0); // Unbind target
+
+    // Bind all of the uniform buffer object to binding point 0
+    glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBO, 0, 3 * sizeof(glm::mat4));
 
     // Depth testing
     glEnable(GL_DEPTH_TEST);
@@ -134,11 +153,9 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set color to clear window with
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen with color
 
-        myShader.use();
-
         // World 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.3f, 0.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(45.0f) * (float)glfwGetTime(), glm::vec3(1.0f, 1.0f, 0.0f));
 
         // Camera
         glm::mat4 view = glm::mat4(1.0f);
@@ -148,20 +165,27 @@ int main() {
         glm::mat4 projection = glm::mat4(1.0f);
         projection = glm::perspective(glm::radians(45.0f), 800.0f/800.0f, 0.1f, 100.0f);
 
-        // Send matrices to vertex shader
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+        // Bind uniform buffer object and send matrices to vertex shader
+        glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
+        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+        glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(projection));
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
         // Draw vertices
+        glBindVertexArray(VAO);
+        lightShader.use();
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+        normalShader.use();
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
 
         glfwSwapBuffers(window); // Swap front and back buffer
         glfwPollEvents(); // Process received events
 
     }
     
-
     glfwTerminate(); // Release all GLFW resources and close windows
 
     return 0;
