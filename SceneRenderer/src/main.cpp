@@ -7,6 +7,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
+
 #include <ShaderLoader.h>
 
 // Callbacks
@@ -31,6 +35,14 @@ int main() {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     }
 
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch (I'm not)
+
     // Create combined GLFW window and context object
     // Context creation is dependent on correctly installed drivers
     GLFWwindow* window = glfwCreateWindow(800, 800, "Test", NULL, NULL);
@@ -42,6 +54,10 @@ int main() {
 
     // In order to use OpenGL API, you make a context current. In this case, our window
     glfwMakeContextCurrent(window);
+
+    // Setup Platform/Renderer backends (MAKE SURE YOU SET THE WINDOW AS THE CURRENT CONTEXT FIRST)
+    ImGui_ImplGlfw_InitForOpenGL(window, true); // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    ImGui_ImplOpenGL3_Init();
 
     // Set window callbacks and settings
     glfwSetKeyCallback(window, esc_callback); // ESCAPE to close window
@@ -152,9 +168,17 @@ int main() {
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
+
+        glfwPollEvents(); // Process received events
         
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set color to clear window with
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen with color
+
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::ShowDemoWindow(); // Show demo window! :)
 
         // World 
         glm::mat4 model = glm::mat4(1.0f);
@@ -188,11 +212,21 @@ int main() {
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(window); // Swap front and back buffer
-        glfwPollEvents(); // Process received events
 
     }
     
+    // Clean up and shut down
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    glDeleteBuffers(1, &UBO);
+    glDeleteVertexArrays(1, &VAO);
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     glfwTerminate(); // Release all GLFW resources and close windows
 
     return 0;
