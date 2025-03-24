@@ -57,7 +57,7 @@ int main() {
 
     // Create Shader Programs
     Shader normalShader("shaders/normalShader/shader.vs", "shaders/normalShader/shader.gs", "shaders/normalShader/shader.fs");
-    Shader lightShader("shaders/lightShader/shader.vs", "shaders/lightShader/shader.fs");
+    Shader lightShader("shaders/lightShader/shader.vs", "shaders/lightShader/shader.gs","shaders/lightShader/shader.fs");
 
     // Create vertex data (cube)
     float vertices[] {
@@ -147,6 +147,9 @@ int main() {
     // Depth testing
     glEnable(GL_DEPTH_TEST);
 
+    // Light setup
+    glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 1.0f);
+
     // Render loop
     while (!glfwWindowShouldClose(window)) {
         
@@ -176,6 +179,10 @@ int main() {
         glBindVertexArray(VAO);
         lightShader.use();
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+        // Pass the light's position
+        int lightPosLoc = glGetUniformLocation(lightShader.ID, "vsLightPos");
+        glUniform3fv(lightPosLoc, 1, glm::value_ptr(lightPos));
 
         normalShader.use();
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
