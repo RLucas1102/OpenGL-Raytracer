@@ -12,3 +12,6 @@
 
 # Test .cpp files
 *Test.cpp
+
+# .ini files
+*.ini
