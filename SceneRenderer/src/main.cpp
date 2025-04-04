@@ -35,14 +35,6 @@ int main() {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     }
 
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-    // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch (I'm not)
-
     // Create combined GLFW window and context object
     // Context creation is dependent on correctly installed drivers
     GLFWwindow* window = glfwCreateWindow(800, 800, "Test", NULL, NULL);
@@ -54,6 +46,14 @@ int main() {
 
     // In order to use OpenGL API, you make a context current. In this case, our window
     glfwMakeContextCurrent(window);
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // IF using Docking Branch (I'm not)
 
     // Setup Platform/Renderer backends (MAKE SURE YOU SET THE WINDOW AS THE CURRENT CONTEXT FIRST)
     ImGui_ImplGlfw_InitForOpenGL(window, true); // Second param install_callback=true will install GLFW callbacks and chain to existing ones.

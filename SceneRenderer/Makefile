@@ -1,9 +1,9 @@
 src := ./src
 inc := ./../include
-imgui := ./imgui
+imgui := ../source/imgui
 obj := ./obj
 bin := ./bin
-lib := ./../../pckgs/glfw-3.4/build/src/libglfw3.a # I am doing static linking
+lib := ./../../pckgs/glfw-3.4/build/src/libglfw3.a ./../../pckgs/assimp/lib/libassimp.a # I am doing static linking
 program := $(bin)/renderer.out
 
 CPP_SOURCES := $(wildcard $(src)/*.cpp)
