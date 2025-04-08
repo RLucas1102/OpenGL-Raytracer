@@ -3,7 +3,8 @@ inc := ./../include
 imgui := ../source/imgui
 obj := ./obj
 bin := ./bin
-lib := ./../../pckgs/glfw-3.4/build/src/libglfw3.a ./../../pckgs/assimp/lib/libassimp.a # I am doing static linking
+libGLFW := ./../../pckgs/glfw-3.4/build/src/libglfw3.a # I am doing static linking
+libASSIMP := ./../../pckgs/assimp/bin
 program := $(bin)/renderer.out
 
 CPP_SOURCES := $(wildcard $(src)/*.cpp)
@@ -18,7 +19,7 @@ C_OBJECTS := $(C_SOURCES:$(src)/%.c=$(obj)/%.o)
 CC = g++
 CFLAGS = -g -I $(inc)
 GUIFLAGS = -I $(inc)/imgui
-LFLAGS = $(lib)
+LFLAGS = $(libGLFW) -L $(libASSIMP) -lassimpmodel
 
 $(program) : $(CPP_OBJECTS) $(GUI_OBJECTS) $(C_OBJECTS)
 	$(CC) $^ $(LFLAGS) -o $@
