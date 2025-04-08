@@ -12,6 +12,7 @@
 #include <imgui/imgui_impl_opengl3.h>
 
 #include <ShaderLoader.h>
+#include <modelLoader/model.h>
 
 // Callbacks
 void error_callback(int error, const char* description);
@@ -75,69 +76,8 @@ int main() {
     Shader normalShader("shaders/normalShader/shader.vs", "shaders/normalShader/shader.gs", "shaders/normalShader/shader.fs");
     Shader lightShader("shaders/lightShader/shader.vs", "shaders/lightShader/shader.gs","shaders/lightShader/shader.fs");
 
-    // Create vertex data (cube)
-    float vertices[] {
-        // Vertices
-         0.5f,  0.5f,  0.5f,    
-        -0.5f,  0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f, -0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f
-    };
-
-    // Create index data
-    unsigned int indices[] {
-       // Front face
-       0, 1, 2,
-       0, 2, 3,
-       // Back face
-       5, 4, 6,
-       6, 4, 7,
-       // Top face
-       4, 5, 1,
-       4, 1, 0,
-       // Bottom face
-       7, 2, 6,
-       7, 3, 2,
-       // Left face
-       1, 5, 6,
-       1, 6, 2,
-       // Right face
-       0, 7, 4,
-       0, 3, 7
-    };
-
-    // Creating buffers and vertex array
-    unsigned int VBO, EBO, VAO;
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    glGenVertexArrays(1, &VAO);
-
-    // Bind a vertex array; all subsequent VBOs and attributes will be bound to this object
-    glBindVertexArray(VAO);
-
-    // Bind array buffer type and then vertex data
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // Bind element buffer type and then index data
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // Position attribute
-    // Index = 0
-    // Number of components = 3
-    // Type = GL_FLOAT
-    // Normalized = False
-    // Stride: 3 * 4 = 12 (Each vertex is 12 bytes apart)
-    // Offset: None
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // Offset: 3 * 4 = 12 (Each vertex is 12 bytes apart)
-    glEnableVertexAttribArray(0); // Enable vertex attribute 0
-
-    glBindVertexArray(0);
+    // Create model
+    Model myModel("models/sphere.obj");
 
     // Create uniform buffer for matrices in vertex shader (Both normalShader and lightShader use all three matrices)
     // Create buffer and generate ID
@@ -164,7 +104,7 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     // Light setup
-    glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 1.0f);
+    glm::vec3 lightPos = glm::vec3(1.0f, 1.0f, 2.0f);
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
@@ -200,17 +140,16 @@ int main() {
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
         // Draw vertices
-        glBindVertexArray(VAO);
         lightShader.use();
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-
+        
         // Pass the light's position
         int lightPosLoc = glGetUniformLocation(lightShader.ID, "vsLightPos");
         glUniform3fv(lightPosLoc, 1, glm::value_ptr(lightPos));
 
-        normalShader.use();
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        myModel.Draw();
+
+        // normalShader.use();
+        // myModel.Draw();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -220,10 +159,7 @@ int main() {
     }
     
     // Clean up and shut down
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
     glDeleteBuffers(1, &UBO);
-    glDeleteVertexArrays(1, &VAO);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
