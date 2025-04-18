@@ -15,10 +15,10 @@
 #ifndef SHAPE_LIST_H
 #define SHAPE_LIST_H
 
-#include <vec/vec3.h>
-#include <vec/ray.h>
-#include <shape/shape.h>
-#include <shape/interval.h>
+#include <raytracing/vec/vec3.h>
+#include <raytracing/vec/ray.h>
+#include <raytracing/shape/shape.h>
+#include <raytracing/shape/interval.h>
 
 #include <memory>
 #include <vector>

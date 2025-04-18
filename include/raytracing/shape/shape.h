@@ -15,9 +15,9 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 
-#include <shape/interval.h>
-#include <vec/vec3.h>
-#include <vec/ray.h>
+#include <raytracing/shape/interval.h>
+#include <raytracing/vec/vec3.h>
+#include <raytracing/vec/ray.h>
 
 class shape {
     private:

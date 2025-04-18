@@ -14,12 +14,12 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <vec/vec3.h>
-#include <vec/ray.h>
-#include <shape/sphere.h>
-#include <shape/shape.h>
-#include <shape/shape_list.h>
-#include <shape/interval.h>
+#include <raytracing/vec/vec3.h>
+#include <raytracing/vec/ray.h>
+#include <raytracing/shape/sphere.h>
+#include <raytracing/shape/shape.h>
+#include <raytracing/shape/shape_list.h>
+#include <raytracing/shape/interval.h>
 
 #include <iostream>
 #include <memory>
