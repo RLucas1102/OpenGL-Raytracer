@@ -12,6 +12,7 @@ in VS_OUT {
 out vec3 normal;
 out vec3 gsFragPos;
 out vec3 gsLightPos;
+out vec3 initialColor;
 
 void main() {
 
@@ -20,6 +21,7 @@ void main() {
     normal = normalize(cross(a, b));
 
     for(int i = 0; i < 3; i++) {
+        initialColor = normal;
         gsFragPos = gs_in[i].fragPos;
         gsLightPos = gs_in[i].lightPos;
         gl_Position = gs_in[0].projection * gl_in[i].gl_Position;
