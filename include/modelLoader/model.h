@@ -77,6 +77,20 @@ class Model {
             } 
         }
 
+        void InstancedDraw(int numObjects) {
+            for (int i = 0; i < _meshes.size(); i++) {
+                _meshes[i].drawInstanced(numObjects);
+            }
+            
+        }
+
+        void SetInstancedDraw(int numObjects, const glm::vec3* positions) {
+            for (int i = 0; i < _meshes.size(); i++) {
+                _meshes[i].setInstancedDraw(numObjects, positions);
+            }
+            
+        }
+
 
 };
 

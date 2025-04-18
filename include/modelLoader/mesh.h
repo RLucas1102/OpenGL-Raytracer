@@ -21,7 +21,7 @@ class Mesh {
         std::vector<unsigned int> _indices;
 
         // Creating buffers and vertex array
-        unsigned int _VBO, _EBO;
+        unsigned int _VBO, _EBO, _VAO, _instanceVBO;
 
         void setupMesh() {
 
@@ -58,8 +58,6 @@ class Mesh {
 
     public:
 
-        unsigned int _VAO;
-
         // Default constructor
         Mesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices) : _vertices(vertices), _indices(indices) {
 
@@ -77,9 +75,33 @@ class Mesh {
 
         }
 
+        void drawInstanced(int numObjects) {
 
+            // Bind VAO and draw mesh
+            glBindVertexArray(_VAO);
+            glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(_indices.size()), GL_UNSIGNED_INT, 0, numObjects);
+            glBindVertexArray(0);
 
-    
+        }
+
+        void setInstancedDraw(int numObjects, const glm::vec3* positions) {
+
+            // Bind VAO
+            glBindVertexArray(_VAO);
+
+            // Generate ID for VBO and load instance data
+            glGenBuffers(1, &_instanceVBO);
+            glBindBuffer(GL_ARRAY_BUFFER, _instanceVBO);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * numObjects, &positions[0], GL_STATIC_DRAW);
+
+            // Instance Attribute
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0); // Start at 0 offset because new VBO
+            glEnableVertexAttribArray(1);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glVertexAttribDivisor(1, 1); // OpenGL now knows this an instanced vertex attribute. 1 means Change value every instance
+
+        }
+
 };
 
 #endif
