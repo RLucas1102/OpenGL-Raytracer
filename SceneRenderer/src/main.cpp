@@ -23,10 +23,10 @@ using std::shared_ptr;
 
 // Callbacks
 void error_callback(int error, const char* description);
-static void esc_callback(GLFWwindow* MyWindow, int key, int scancode, int action, int mods); // Make local to this file
+static void key_callback(GLFWwindow* MyWindow, int key, int scancode, int action, int mods); // Make local to this file
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
-// Camera setup
+// Camera/world setup
 camera myCamera;
 shape_list world;
 
@@ -60,7 +60,7 @@ int main() {
     glfwMakeContextCurrent(window);
 
     // Set window callbacks and settings
-    glfwSetKeyCallback(window, esc_callback); // ESCAPE to close window
+    glfwSetKeyCallback(window, key_callback); // ESCAPE to close window
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSwapInterval(1); // Set swap interval to 1; by default it is 0 and will waste CPU and GPU time on fast machines
 
@@ -158,7 +158,7 @@ int main() {
 
         // World 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.5f));
 
         // Camera
         glm::mat4 view = glm::mat4(1.0f);
@@ -212,11 +212,16 @@ void error_callback(int error, const char *description)
 /* 
  * Receive key press when ESCAPE key is pressed
  */
-void esc_callback(GLFWwindow *MyWindow, int key, int scancode, int action, int mods)
+void key_callback(GLFWwindow *MyWindow, int key, int scancode, int action, int mods)
 {
     if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(MyWindow, true);
     }
+
+    if(key == GLFW_KEY_A && action == GLFW_PRESS) {
+        myCamera.render(world);
+    }
+
 }
 
 /*

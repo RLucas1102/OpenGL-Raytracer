@@ -22,6 +22,7 @@
 #include <raytracing/shape/interval.h>
 
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <vector>
 #include <limits>
@@ -35,6 +36,8 @@ using std::shared_ptr;  // A smart pointer that increments a reference counter e
 
 class camera {
     private:
+        std::ofstream ofs;
+
         //Image
         float _aspect_ratio;
         int _img_width;
@@ -68,7 +71,7 @@ class camera {
                 _img_height = 1; 
 
             _focal_length = 1.0;
-            _camera_center = vec3(0,0,0); // Camera starts at 0,0,0 in space
+            _camera_center = vec3(0,0,10); // Camera starts at 0,0,0 in space
 
             _viewport_height = 2.0; // Arbitrary
             _viewport_width = _viewport_height * ((float)_img_width / _img_height); // Calculating aspect ratio with width and height for accuracy
@@ -139,7 +142,7 @@ class camera {
             int gByte = (int)255.999 * g;
             int bByte = (int)255.999 * b;
         
-            std::cout << rByte << ' ' << gByte << ' ' << bByte << "\n";
+            ofs << rByte << ' ' << gByte << ' ' << bByte << "\n";
         
         }
 
@@ -149,13 +152,16 @@ class camera {
         void setImgWidth(int width) { _img_width = width; }
 
         void render(shape_list& world) {
+
+            ofs.open("images/output.ppm");
+
             // Set all variables
             initialize();
 
             // P3 states we are using ASCII for our colors
             // Image size is base on _img_width x _img_height
             // Max color will be 255
-            std::cout << "P3\n" << _img_width << ' ' << _img_height << "\n255\n";
+            ofs << "P3\n" << _img_width << ' ' << _img_height << "\n255\n";
 
             // For every pixel of the image from left to right, top to bottom,
             // shoot a ray from the camera into the center of the viewport pixel.
@@ -176,6 +182,8 @@ class camera {
                 
                 }
             }
+
+            ofs.close();
 
         }
 
