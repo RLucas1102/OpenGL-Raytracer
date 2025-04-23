@@ -17,6 +17,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <raytracing/utils/utils.h>
 
 class vec3 
 {
@@ -151,5 +152,97 @@ inline vec3 normalize(const vec3& v) {
 
     return vec3(norm_x, norm_y, norm_z);
 }
+
+/*
+ * This function creates a vec3 with random x,y,x
+ * components
+ * 
+ * @param None
+ * @return vec3
+ */
+inline vec3 random_vec() {
+    return vec3(random_float(), random_float(), random_float());
+}
+
+/*
+ * This function creates a vec3 with random x,y,x
+ * components within a specified min and max
+ * 
+ * @param float min and max
+ * @return vec3
+ */
+inline vec3 random_vec(float min, float max) {
+    return vec3(random_float(min, max), random_float(min, max), random_float(min, max));
+}
+
+/*
+ * This function attempts to find a vector
+ * to work with that falls within the sphere.
+ * Once it does, it generates a normal unit vector
+ * 
+ * @param None
+ * @return vec3
+ */
+inline vec3 random_unit_vector() {
+    bool foundVec = false;
+    vec3 result;
+
+    while(!foundVec) {
+        vec3 point = random_vec(-1, 1);
+        float mag = point.length_squared();
+        if (1e-160 < mag && mag <= 1) {
+            result = multiply(point, (1 / sqrt(mag)));
+            foundVec = true;
+        }
+    }
+
+    return result;
+}
+
+/*
+ * This function tests to see what side of the 
+ * sphere the unit vector is pointing. If the
+ * dot is positive, it points outwards. If the
+ * dot is negative, it points inwards and must
+ * be reversed
+ * 
+ * @param The object's normal
+ * @return vec3
+ */
+inline vec3 random_on_hemisphere(const vec3& normal) {
+    vec3 on_unit_sphere = random_unit_vector();
+    vec3 result;
+
+    if(dot(on_unit_sphere, normal) > 0.0) {
+        result = on_unit_sphere;
+    }
+    else {
+        result = on_unit_sphere.negate();
+    }
+
+    return result;
+}
+
+/*
+ * This function converts our linear space
+ * colors to gamma space. Computers expect
+ * images to be gamma space, but, without
+ * this function, we produce colors in
+ * linear space.
+ * 
+ * @param The object's normal
+ * @return vec3
+ */
+inline float linear_to_gamma(float linear_component) {
+    float result = 0;
+
+    if (linear_component > 0) {
+        result = sqrt(linear_component);
+    }
+
+    return result;
+
+}
+
 
 #endif

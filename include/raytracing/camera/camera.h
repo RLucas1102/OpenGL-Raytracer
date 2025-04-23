@@ -43,6 +43,7 @@ class camera {
         int _img_height;
         int _samples_per_pixel;
         float _pixel_samples_scale; // Color scale factor for a sum of pixel samples
+        int _max_depth; // Maximum number of ray bounces into scene
 
         // Camera setup
         float _focal_length;
@@ -74,7 +75,7 @@ class camera {
             _pixel_samples_scale = 1.0 / _samples_per_pixel;
             
             _focal_length = 1.0;
-            _camera_center = vec3(0,0,1); // Camera starts at 0,0,0 in space
+            _camera_center = vec3(0,0,0); // Camera starts at 0,0,0 in space
 
             _viewport_height = 2.0; // Arbitrary
             _viewport_width = _viewport_height * ((float)_img_width / _img_height); // Calculating aspect ratio with width and height for accuracy
@@ -107,13 +108,18 @@ class camera {
          * world which contains all out objects
          * @return a color vector
          */
-        vec3 rayColor(const ray &r, shape_list &world)
+        vec3 rayColor(const ray &r, int depth, shape_list &world)
         {
+
             vec3 result;
         
-            if(world.hit(r, interval(0, infinity))) {
-                vec3 white(1,1,1);
-                result = multiply(add(world.getTempObject()->getNormal(), white), 0.5); // 0.5 * (shape's normal + white(1,1,1))
+
+            if(depth <= 0) {
+                result = vec3(0,0,0); // If we exceed ray bounce limit, no more light is gathered
+            }
+            else if(world.hit(r, interval(0.001, infinity))) {
+                vec3 dir = add(world.getTempObject()->getNormal(), random_unit_vector());
+                return multiply(rayColor(ray(world.getTempObject()->getHitPoint(), dir), depth-1, world), 0.5);
             }
             else {
                 vec3 unit_direction = normalize(r.getDirection());
@@ -139,6 +145,11 @@ class camera {
             float r = pixel_color.getX();
             float g = pixel_color.getY();
             float b = pixel_color.getZ();
+
+            // Apply linear to gamma transform for gamma 2
+            r = linear_to_gamma(r);
+            g = linear_to_gamma(g);
+            b = linear_to_gamma(b);
         
             // Translate all the [0,1] values to RGB [0,255]
             interval intensity(0.000, 0.999);
@@ -189,6 +200,7 @@ class camera {
         void setAspect(float aspect) { _aspect_ratio = aspect; }
         void setImgWidth(int width) { _img_width = width; }
         void setPixSamples(int samples) {_samples_per_pixel = samples; }
+        void setDepth(int depth) {_max_depth = depth; }
 
         void render(shape_list& world) {
 
@@ -212,7 +224,7 @@ class camera {
                     vec3 pixel_color(0,0,0);
                     for (int sample = 0; sample < _samples_per_pixel; sample++) {
                         ray r = get_ray(j, i);
-                        pixel_color = add(pixel_color, rayColor(r, world));
+                        pixel_color = add(pixel_color, rayColor(r, _max_depth, world));
                     }
                 
                     // Send pixel color to file for output

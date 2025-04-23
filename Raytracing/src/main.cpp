@@ -24,6 +24,7 @@ int main() {
     MyCamera.setAspect(16.0/9.0);
     MyCamera.setImgWidth(400);
     MyCamera.setPixSamples(100);
+    MyCamera.setDepth(50);
     
     // World setup
     shape_list world;
