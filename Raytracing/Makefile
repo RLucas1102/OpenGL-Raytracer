@@ -17,4 +17,4 @@ $(objects): %.o : $(src)/%.cpp
 clean:
 	rm -f *.o
 	rm -f test
-	rm *.ppm
+	rm images/*.ppm
