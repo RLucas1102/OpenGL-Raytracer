@@ -1,7 +1,7 @@
 /********************************************************************************
  * Name: Lucas Robenolt
  * 
- * Last Updated: 3/12/2025
+ * Last Updated: 4/23/2025
  * 
  * Email: robenoltl@gmail.com
  *
@@ -20,6 +20,7 @@
 #include <raytracing/shape/shape.h>
 #include <raytracing/shape/shape_list.h>
 #include <raytracing/shape/interval.h>
+#include <raytracing/utils/utils.h>
 
 #include <iostream>
 #include <fstream>
@@ -31,8 +32,6 @@
 using std::make_shared; // Returns a shared pointer of the given type
 using std::shared_ptr;  // A smart pointer that increments a reference counter every time a new instance is allocated
 
-#define infinity std::numeric_limits<double>::infinity() 
-#define pi 3.1415926535897932385
 
 class camera {
     private:
@@ -42,6 +41,8 @@ class camera {
         float _aspect_ratio;
         int _img_width;
         int _img_height;
+        int _samples_per_pixel;
+        float _pixel_samples_scale; // Color scale factor for a sum of pixel samples
 
         // Camera setup
         float _focal_length;
@@ -70,8 +71,10 @@ class camera {
             if (_img_height < 1)
                 _img_height = 1; 
 
+            _pixel_samples_scale = 1.0 / _samples_per_pixel;
+            
             _focal_length = 1.0;
-            _camera_center = vec3(0,0,10); // Camera starts at 0,0,0 in space
+            _camera_center = vec3(0,0,1); // Camera starts at 0,0,0 in space
 
             _viewport_height = 2.0; // Arbitrary
             _viewport_width = _viewport_height * ((float)_img_width / _img_height); // Calculating aspect ratio with width and height for accuracy
@@ -138,18 +141,54 @@ class camera {
             float b = pixel_color.getZ();
         
             // Translate all the [0,1] values to RGB [0,255]
-            int rByte = (int)255.999 * r;
-            int gByte = (int)255.999 * g;
-            int bByte = (int)255.999 * b;
+            interval intensity(0.000, 0.999);
+            int rByte = (int)(255.999 * intensity.clamp(r));
+            int gByte = (int)(255.999 * intensity.clamp(g));
+            int bByte = (int)(255.999 * intensity.clamp(b));
         
             ofs << rByte << ' ' << gByte << ' ' << bByte << "\n";
         
+        }
+
+        /*
+         * This function creates a ray directed towards 
+         * a randomly sampled point around the pixel
+         * defined by location i, j
+         * 
+         * @param i and j are the 2D components of a pixel
+         * @return ray
+         */
+        ray get_ray(int i, int j) const {
+            vec3 offset = sample_square();
+            vec3 pixel_sample = add(_first_pix_loc,
+                                add(
+                                    multiply(_pixel_du, i + offset.getX()), 
+                                    multiply(_pixel_dv, j + offset.getY())
+                                    )
+                                );
+
+            vec3 ray_origin = _camera_center;
+            vec3 ray_dir = subtract(pixel_sample, ray_origin);
+
+            return ray(ray_origin, ray_dir);
+        }
+
+        /*
+         * This function generates a random point within a square
+         * Will be used to sample points in a unit square
+         * 
+         * @param None
+         * @return vec3
+         */
+        vec3 sample_square() const {
+            return vec3(random_float() - 0.5, random_float() - 0.5, 0);
         }
 
     public:
 
         void setAspect(float aspect) { _aspect_ratio = aspect; }
         void setImgWidth(int width) { _img_width = width; }
+        void setPixSamples(int samples) {_samples_per_pixel = samples; }
 
         void render(shape_list& world) {
 
@@ -170,15 +209,14 @@ class camera {
             // the color based on what is hit within the scene.
             for (int i = 0; i < _img_height; i++) {
                 for (int j = 0; j < _img_width; j++) {
-                
-                    // _first_pix_loc + (i * _pixel_du) + (j * _pixel_dv)
-                    vec3 pixel_center = add(add(_first_pix_loc, multiply(_pixel_du, j)), multiply(_pixel_dv, i));
-                    vec3 ray_dir = subtract(pixel_center, _camera_center);
-                    ray r(_camera_center, ray_dir);
+                    vec3 pixel_color(0,0,0);
+                    for (int sample = 0; sample < _samples_per_pixel; sample++) {
+                        ray r = get_ray(j, i);
+                        pixel_color = add(pixel_color, rayColor(r, world));
+                    }
                 
                     // Send pixel color to file for output
-                    vec3 pixel_color = rayColor(r, world);
-                    writeColor(pixel_color);
+                    writeColor(multiply(pixel_color, _pixel_samples_scale));
                 
                 }
             }

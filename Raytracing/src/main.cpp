@@ -1,10 +1,10 @@
-#include <vec/vec3.h>
-#include <vec/ray.h>
-#include <shape/sphere.h>
-#include <shape/shape.h>
-#include <shape/shape_list.h>
-#include <shape/interval.h>
-#include <camera/camera.h>
+#include <raytracing/vec/vec3.h>
+#include <raytracing/vec/ray.h>
+#include <raytracing/shape/sphere.h>
+#include <raytracing/shape/shape.h>
+#include <raytracing/shape/shape_list.h>
+#include <raytracing/shape/interval.h>
+#include <raytracing/camera/camera.h>
 
 #include <iostream>
 #include <memory>
@@ -15,13 +15,6 @@
 using std::make_shared;
 using std::shared_ptr;
 
-#define infinity std::numeric_limits<double>::infinity()
-#define pi 3.1415926535897932385
-
-// Prototypes
-// ----------
-float degreesToRadians(float degrees);
-
 int main() {
 
     // Create camera object
@@ -30,6 +23,7 @@ int main() {
     // Set image aspect ratio and width
     MyCamera.setAspect(16.0/9.0);
     MyCamera.setImgWidth(400);
+    MyCamera.setPixSamples(100);
     
     // World setup
     shape_list world;
@@ -41,11 +35,4 @@ int main() {
     MyCamera.render(world);
 
     return 0;
-}
-
-// Function definitions
-// --------------------
-float degreesToRadians(float degrees)
-{
-    return (degrees * pi) / 180.0;
 }

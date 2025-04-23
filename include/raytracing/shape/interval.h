@@ -1,7 +1,7 @@
 /********************************************************************************
  * Name: Lucas Robenolt
  * 
- * Last Updated: 3/12/2025
+ * Last Updated: 4/23/2025
  * 
  * Email: robenoltl@gmail.com
  *
@@ -47,6 +47,23 @@ class interval {
 
         // Returns true or false depending if t is within the acceptable range
         bool surrounds(float t) const { return _min < t && t < _max; }
+
+        // Ensures that a value is within the min and max
+        float clamp(float x) const {
+            float result;
+
+            if (x < _min) {
+                result = _min;
+            }
+            else if(x > _max) {
+                result = _max;
+            }
+            else {
+                result = x;
+            }
+
+            return result;
+        }
 
 };
     
