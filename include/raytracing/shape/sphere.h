@@ -1,7 +1,7 @@
 /********************************************************************************
  * Name: Lucas Robenolt
  * 
- * Last Updated: 3/12/2025
+ * Last Updated: 4/23/2025
  * 
  * Email: robenoltl@gmail.com
  *
@@ -18,15 +18,17 @@
 #include <raytracing/shape/shape.h>
 #include <raytracing/vec/vec3.h>
 #include <raytracing/vec/ray.h>
+#include <raytracing/materials/material.h>
 
 class sphere : public shape {
     private:
         vec3 _center;
         float _radius;
+        shared_ptr<material> _mat;
 
     public:
         // Constructor
-        sphere(const vec3& center, float radius) : _center(center), _radius(std::fmax(0, radius)) {}
+        sphere(const vec3& center, float radius, shared_ptr<material> mat) : _center(center), _radius(std::fmax(0, radius)), _mat(mat) {}
 
         /*
          * This function takes a ray being shot into the scene
@@ -72,6 +74,7 @@ class sphere : public shape {
 
                 setT(t); // Set t for where the hit point occurs
                 setHitPoint( r.at(t) ); // Set hit point
+                setMat(_mat);
 
                 // The normal for a sphere is hit point (P) - center (C)
                 // To get a normal with unit length, we simply divide the difference by the radius

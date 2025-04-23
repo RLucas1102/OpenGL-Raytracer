@@ -70,6 +70,17 @@ class vec3
             return (_x * _x) + (_y * _y) + (_z * _z);
         }
 
+        // Returns true if the vector is close to zero in all dimensions
+        bool near_zero() const {
+            float s = 1e-8;
+            bool isClose = false;
+            if(std::fabs(_x) < s && std::fabs(_y) < s && std::fabs(_z) < s) {
+                isClose = true;
+            }
+
+            return isClose;
+        }
+
         // Print out the x, y, and z components of the vector
         void print() {
             std::cout << _x << ", " << _y << ", " << _z << std::endl;
@@ -242,6 +253,17 @@ inline float linear_to_gamma(float linear_component) {
 
     return result;
 
+}
+
+/*
+ * This function finds the reflection
+ * vector from a vector and a normal
+ * 
+ * @param A vector and an object's normal
+ * @return vec3
+ */
+inline vec3 reflect(const vec3& v, const vec3& n) {
+    return subtract(v, multiply(n, 2 * dot(v, n)));
 }
 
 

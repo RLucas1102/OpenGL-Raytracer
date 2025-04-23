@@ -5,6 +5,7 @@
 #include <raytracing/shape/shape_list.h>
 #include <raytracing/shape/interval.h>
 #include <raytracing/camera/camera.h>
+#include <raytracing/materials/material.h>
 
 #include <iostream>
 #include <memory>
@@ -29,9 +30,17 @@ int main() {
     // World setup
     shape_list world;
 
+    // Materials
+    shared_ptr<lambertian> mat_ground = make_shared<lambertian>(vec3(0.8, 0.8, 0.0));
+    shared_ptr<lambertian> mat_ball = make_shared<lambertian>(vec3(0.1, 0.2, 0.5));
+    shared_ptr<metal> mat_metalBall1 = make_shared<metal>(vec3(0.8, 0.8, 0.8), 0.3);
+    shared_ptr<metal> mat_metalBall2 = make_shared<metal>(vec3(0.8, 0.6, 0.2), 1.0);
+
     // Add a sphere and a "plane" to the scene
-    world.add(make_shared<sphere>(vec3(0,0,-1), 0.5));
-    world.add(make_shared<sphere>(vec3(0,-100.5,-1), 100));
+    world.add(make_shared<sphere>(vec3(0,0,-1.2), 0.5, mat_ball));
+    world.add(make_shared<sphere>(vec3(0,-100.5,-1), 100, mat_ground));
+    world.add(make_shared<sphere>(vec3(-1.0, 0.0, -1.0), 0.5, mat_metalBall1));
+    world.add(make_shared<sphere>(vec3(1.0, 0.0, -1.0), 0.5, mat_metalBall2));
 
     MyCamera.render(world);
 

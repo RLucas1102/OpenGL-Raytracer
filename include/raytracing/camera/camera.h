@@ -118,8 +118,14 @@ class camera {
                 result = vec3(0,0,0); // If we exceed ray bounce limit, no more light is gathered
             }
             else if(world.hit(r, interval(0.001, infinity))) {
-                vec3 dir = add(world.getTempObject()->getNormal(), random_unit_vector());
-                return multiply(rayColor(ray(world.getTempObject()->getHitPoint(), dir), depth-1, world), 0.5);
+               ray scattered;
+               vec3 attenuation;
+               if(world.getTempObject()->getMat()->scatter(r, world.getTempObject(), attenuation, scattered)) {
+                    vec3 color = rayColor(scattered, depth-1, world);
+                    result.setX(attenuation.getX() * color.getX());
+                    result.setY(attenuation.getY() * color.getY());
+                    result.setZ(attenuation.getZ() * color.getZ());
+               }
             }
             else {
                 vec3 unit_direction = normalize(r.getDirection());
