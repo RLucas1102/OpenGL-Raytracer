@@ -44,10 +44,15 @@ class camera {
         int _samples_per_pixel;
         float _pixel_samples_scale; // Color scale factor for a sum of pixel samples
         int _max_depth; // Maximum number of ray bounces into scene
+        vec3 u, v, w; // Camera frame basis vectors
 
         // Camera setup
         float _focal_length;
         vec3 _camera_center;
+        vec3 _camPos; // Point camera is viewing from
+        vec3 _lookAt; // Point of interest
+        vec3 _camUp; // Camera's Relative up direction
+        float _vfov; // Vertical view angle (field of view)
 
         // Viewport setup
         float _viewport_height;
@@ -73,15 +78,25 @@ class camera {
                 _img_height = 1; 
 
             _pixel_samples_scale = 1.0 / _samples_per_pixel;
-            
-            _focal_length = 1.0;
-            _camera_center = vec3(0,0,0); // Camera starts at 0,0,0 in space
 
-            _viewport_height = 2.0; // Arbitrary
+            _camera_center = _camPos; // Camera starts at 0,0,0 in space
+
+            // Determine vieport dimensions
+            _focal_length = (subtract(_camPos, _lookAt)).length();
+            float theta = degreesToRadians(_vfov);
+            float h = std::tan(theta/2);
+
+            _viewport_height = 2.0 * h * _focal_length;
             _viewport_width = _viewport_height * ((float)_img_width / _img_height); // Calculating aspect ratio with width and height for accuracy
             
-            _viewport_u = vec3(_viewport_width, 0, 0); // Goes from left to right
-            _viewport_v = vec3(0, -_viewport_height, 0); // Goes from top to bottom (must be negative)
+            // Calculate the u,v,w unit basis vectors for the camera coordinate frame
+            w = normalize(subtract(_camPos, _lookAt));
+            u = normalize(cross(_camUp, w));
+            v = cross(w, u);
+
+            // Calculate the vectors across the horizontal and down the vertical viewport edges
+            _viewport_u = multiply(u, _viewport_width); // Goes from left to right
+            _viewport_v = multiply(v.negate(), _viewport_height); // Goes from top to bottom (must be negative)
 
             // Calculate the exact spacing between each pixel center based on the current image size 
             // and viewport horizontal and vertical vectors
@@ -89,7 +104,7 @@ class camera {
             _pixel_dv = multiply(_viewport_v, (float)1/_img_height);
 
             // Calculates the very top left corner of the viewport
-            _viewport_upper_left = subtract(subtract(subtract(_camera_center, vec3(0, 0, _focal_length)), multiply(_viewport_u, 0.5)), multiply(_viewport_v, 0.5));
+            _viewport_upper_left = subtract(subtract(subtract(_camera_center, (multiply(w, _focal_length))), multiply(_viewport_u, 0.5)), multiply(_viewport_v, 0.5));
 
             // The first pixel is inset by half the spacing between each pixel
             // This ensures that the viewport is evenly divided
@@ -207,6 +222,10 @@ class camera {
         void setImgWidth(int width) { _img_width = width; }
         void setPixSamples(int samples) {_samples_per_pixel = samples; }
         void setDepth(int depth) {_max_depth = depth; }
+        void setVFov(float vfov) {_vfov = vfov; }
+        void setCamPos(vec3 camPos) {_camPos = camPos; }
+        void setLookAt(vec3 poi) {_lookAt = poi; }
+        void setCamUp(vec3 camUp) {_camUp = camUp; }
 
         void render(shape_list& world) {
 
