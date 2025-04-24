@@ -266,5 +266,20 @@ inline vec3 reflect(const vec3& v, const vec3& n) {
     return subtract(v, multiply(n, 2 * dot(v, n)));
 }
 
+/*
+ * This function finds the refraction
+ * vector from a direction, normal, and 
+ * refractive index
+ * 
+ * @param A vector and an object's normal
+ * @return vec3
+ */
+inline vec3 refract(const vec3& uv, const vec3& n, float etai_over_etat) {
+    float cos_theta = std::fmin(dot(uv.negate(), n), 1.0);
+    vec3 r_out_perp = multiply(add(uv, multiply(n, cos_theta)), etai_over_etat);
+    vec3 r_out_parallel = multiply(n, -sqrt(std::fabs(1.0 - r_out_perp.length_squared())));
+    return add(r_out_perp, r_out_parallel);
+}
+
 
 #endif

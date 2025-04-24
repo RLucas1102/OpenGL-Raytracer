@@ -79,4 +79,53 @@ class metal : public material {
         }
 };
 
+class dielectric : public material {
+    private:
+        float _refraction_index; // Refractive index in vacuum or air, or ratio of material's ri ove world's ri
+
+    public:
+        dielectric(float refraction_index) : _refraction_index(refraction_index) {}
+
+        // Schlick's approximation for reflectance
+        float reflectance(float cosine, float refraction_index) const {
+            float r0 = (1 - refraction_index) / (1 + refraction_index);
+            r0 = r0 * r0;
+            return r0 + (1-r0) * std::pow((1 - cosine), 5);
+        }
+
+        bool scatter(const ray& r_in, const shared_ptr<shape> hit_shape, vec3& attenuation, ray& scattered) const  override {
+
+            float ri;
+            if(hit_shape->getFront()) {
+                ri = (1.0/_refraction_index);
+            }
+            else {
+                ri = _refraction_index;
+            }
+
+            vec3 unit_dir = normalize(r_in.getDirection());
+            float cos_theta = std::fmin(dot(unit_dir.negate(), hit_shape->getNormal()), 1.0);
+            float sin_theta = std::sqrt(1.0 - cos_theta*cos_theta);
+
+            bool cannot_refract = false;
+            vec3 direction;
+
+            if (ri * sin_theta > 1.0) {
+                cannot_refract = true;
+            }
+
+            if(cannot_refract || reflectance(cos_theta, ri) > random_float()) {
+                direction = reflect(unit_dir, hit_shape->getNormal());
+            }
+            else {
+                direction = refract(unit_dir, hit_shape->getNormal(), ri);
+            }
+
+            scattered = ray(hit_shape->getHitPoint(), direction);
+            attenuation = vec3(1.0, 1.0, 1.0);
+
+            return true;
+        }
+};
+
 #endif

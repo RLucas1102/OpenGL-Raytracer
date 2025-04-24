@@ -58,7 +58,8 @@ class shape {
         const vec3& getHitPoint() const { return _hit_point; }
         const vec3& getNormal() const { return _normal; }
         float getT() const { return _t; }
-        const shared_ptr<material> getMat() {return _mat; }
+        const shared_ptr<material> getMat() { return _mat; }
+        bool getFront() const { return _isFront; }
     
         // Mutators 
         void setHitPoint(const vec3& point) { _hit_point = point; }
