@@ -238,13 +238,13 @@ class camera {
             // Image size is base on _img_width x _img_height
             // Max color will be 255
             ofs << "P3\n" << _img_width << ' ' << _img_height << "\n255\n";
-
             // For every pixel of the image from left to right, top to bottom,
             // shoot a ray from the camera into the center of the viewport pixel.
             // Determine the ray direction by taking the difference between the
             // pixel center and camera center. Then create a new ray and determine
             // the color based on what is hit within the scene.
             for (int i = 0; i < _img_height; i++) {
+                std::clog << "\rScanlines remaining: " << (_img_height - i) << ' ' << std::flush;
                 for (int j = 0; j < _img_width; j++) {
                     vec3 pixel_color(0,0,0);
                     for (int sample = 0; sample < _samples_per_pixel; sample++) {
@@ -258,6 +258,7 @@ class camera {
                 }
             }
 
+            std::clog << "\rDone.               \n";
             ofs.close();
 
         }
