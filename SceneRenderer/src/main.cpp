@@ -77,7 +77,9 @@ int main() {
 
     unsigned int amount = 10;
     glm::mat4* modelMatrices;
+    glm::vec3* colors;
     modelMatrices = new glm::mat4[amount];
+    colors = new glm::vec3[amount];
     std::srand(time(NULL));
 
     for(int i = 0; i < amount; i++) {
@@ -94,10 +96,20 @@ int main() {
 
         // 3. Add to list of matrices
         modelMatrices[i] = model;
+
+        // 4. Create random color for object
+        float r = std::rand() / (RAND_MAX + 1.0);
+        float g = std::rand() / (RAND_MAX + 1.0);
+        float b = std::rand() / (RAND_MAX + 1.0);
+        glm::vec3 color = glm::vec3(r, g, b);
+
+        // 5. Add to list of colors
+        colors[i] = color;
         
     }
 
     myModel.SetInstancedDraw(amount, modelMatrices);
+    myModel.SetInstanceColors(amount, colors);
     
     // Create uniform buffer for matrices in vertex shader (Both normalShader and lightShader use all three matrices)
     // Create buffer and generate ID

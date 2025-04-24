@@ -91,6 +91,13 @@ class Model {
             
         }
 
+        void SetInstanceColors(int numObjects, const glm::vec3* colors) {
+            for (int i = 0; i < _meshes.size(); i++) {
+                _meshes[i].setInstanceColors(numObjects, colors);
+            }
+            
+        }
+
 
 };
 
