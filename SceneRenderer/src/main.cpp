@@ -13,6 +13,7 @@
 #include <modelLoader/model.h>
 
 #include <raytracing/camera/camera.h>
+#include <raytracing/materials/material.h>
 #include <raytracing/shape/shape_list.h>
 #include <raytracing/shape/shape.h>
 #include <raytracing/shape/sphere.h>
@@ -25,6 +26,10 @@ using std::shared_ptr;
 void error_callback(int error, const char* description);
 static void key_callback(GLFWwindow* MyWindow, int key, int scancode, int action, int mods); // Make local to this file
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
+// World/Camera Setup
+shape_list World;
+camera MyCamera;
 
 int main() {
 
@@ -75,11 +80,41 @@ int main() {
     // Create model
     Model myModel("models/sphere.obj");
 
+    // Camera Configuration
+    MyCamera.setVFov(45);
+    MyCamera.setAspect(1.0/1.0);
+    MyCamera.setImgWidth(800);
+    MyCamera.setCamPos(vec3(0,0,0));
+    MyCamera.setCamUp(vec3(0,1,0));
+    MyCamera.setLookAt(vec3(0,0,-1));
+    MyCamera.setPixSamples(100);
+    MyCamera.setDepth(50);
+
+    // Creating instance matrices
+    glm::vec3 colorBlindColors[8] = {
+        glm::vec3(0.2f, 0.1333f, 0.53333),
+        glm::vec3(0.06667f, 0.46667f, 0.2f),
+        glm::vec3(0.26667f, 0.66667f, 0.6f),
+        glm::vec3(0.53333f, 0.8f, 0.93333f),
+        glm::vec3(0.86667f, 0.8f, 0.46667f),
+        glm::vec3(0.8f, 0.4f, 0.46667f),
+        glm::vec3(0.66667f, 0.26666f, 0.6f),
+        glm::vec3(0.53333f, 0.13333f, 0.33333f)
+    };
+
+    bool colorBlind = false;
+    std::string userInput;
+    std::cout << "Would you like to enter colorblind friendly mode (Y or N)?" << std::endl;
+    std::cin >> userInput;
+    if(userInput.compare("Y") == 0 || userInput.compare("y") == 0) {
+        colorBlind = true;
+    }
+
     unsigned int amount = 10;
     glm::mat4* modelMatrices;
     glm::vec3* colors;
-    modelMatrices = new glm::mat4[amount];
-    colors = new glm::vec3[amount];
+    modelMatrices = new glm::mat4[amount + 1];
+    colors = new glm::vec3[amount + 1];
     std::srand(time(NULL));
 
     for(int i = 0; i < amount; i++) {
@@ -88,7 +123,8 @@ int main() {
         // 1. Translate to random position
         float x =  -3 + (3 + 3) * (std::rand() / (RAND_MAX + 1.0));
         float y =  -3 + (3 + 3) * (std::rand() / (RAND_MAX + 1.0));
-        model = glm::translate(model, glm::vec3(x, y, -10));
+        float z = -10;
+        model = glm::translate(model, glm::vec3(x, y, z));
 
         // 2. Scale randomly
         float scale = 0.5 + (1 - 0.5) * (std::rand() / (RAND_MAX + 1.0));
@@ -98,18 +134,46 @@ int main() {
         modelMatrices[i] = model;
 
         // 4. Create random color for object
-        float r = std::rand() / (RAND_MAX + 1.0);
-        float g = std::rand() / (RAND_MAX + 1.0);
-        float b = std::rand() / (RAND_MAX + 1.0);
-        glm::vec3 color = glm::vec3(r, g, b);
+        glm::vec3 color;
+        float r, g, b;
+        if (colorBlind) {
+            int randIdx = std::rand() % 8;
+            color = colorBlindColors[randIdx];
+        }
+        else {
+            r = std::rand() / (RAND_MAX + 1.0);
+            g = std::rand() / (RAND_MAX + 1.0);
+            b = std::rand() / (RAND_MAX + 1.0);
+            color = glm::vec3(r, g, b);
+        }
 
         // 5. Add to list of colors
         colors[i] = color;
+
+        // 6. Add to world
+        shared_ptr<material> mat = make_shared<lambertian>(vec3(color.x, color.y, color.z));
+        World.add(make_shared<sphere>(vec3(x, y, z), scale, mat));
         
     }
 
-    myModel.SetInstancedDraw(amount, modelMatrices);
-    myModel.SetInstanceColors(amount, colors);
+    // Create plane for world
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::vec3 color = colorBlindColors[1];
+    float x = 0.0f;
+    float y = -120.5f;
+    float z = -10.0f;
+    float scale = 100.0f;
+    model = glm::translate(model, glm::vec3(x, y, z));
+    model = glm::scale(model, glm::vec3(scale));
+
+    modelMatrices[amount] = model;
+    colors[amount] = color;
+
+    World.add(make_shared<sphere>(vec3(x, y, z), scale, make_shared<lambertian>(vec3(color.x, color.y, color.z))));
+
+    // Set instances and colors for instances
+    myModel.SetInstancedDraw(amount + 1, modelMatrices);
+    myModel.SetInstanceColors(amount + 1, colors);
     
     // Create uniform buffer for matrices in vertex shader (Both normalShader and lightShader use all three matrices)
     // Create buffer and generate ID
@@ -166,7 +230,7 @@ int main() {
 
         // Draw vertices
         testShader.use();
-        myModel.InstancedDraw(amount);
+        myModel.InstancedDraw(amount + 1);
 
         glfwSwapBuffers(window); // Swap front and back buffer
 
@@ -200,7 +264,7 @@ void key_callback(GLFWwindow *MyWindow, int key, int scancode, int action, int m
     }
 
     if(key == GLFW_KEY_A && action == GLFW_PRESS) {
-        //myCamera.render(world);
+        MyCamera.render(World);
     }
 
 }
