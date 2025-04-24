@@ -26,10 +26,6 @@ void error_callback(int error, const char* description);
 static void key_callback(GLFWwindow* MyWindow, int key, int scancode, int action, int mods); // Make local to this file
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
-// Camera/world setup
-camera myCamera;
-shape_list world;
-
 int main() {
 
     // One of the few functions that can be called before GLFW is initalized
@@ -72,54 +68,36 @@ int main() {
     }
 
     // Create Shader Programs
-    Shader normalShader("shaders/normalShader/shader.vs", "shaders/normalShader/shader.gs", "shaders/normalShader/shader.fs");
-    Shader lightShader("shaders/lightShader/shader.vs", "shaders/lightShader/shader.gs","shaders/lightShader/shader2.fs");
+    // Shader normalShader("shaders/normalShader/shader.vs", "shaders/normalShader/shader.gs", "shaders/normalShader/shader.fs");
+    // Shader lightShader("shaders/lightShader/shader.vs", "shaders/lightshader/shader.gs", "shaders/lightShader/shader.fs");
+    Shader testShader("shaders/testShader/shader.vs", "shaders/testShader/shader.fs");
 
     // Create model
     Model myModel("models/sphere.obj");
 
-    // Camera setup
-    myCamera.setAspect(1.0/1.0);
-    myCamera.setImgWidth(800);
+    unsigned int amount = 10;
+    glm::mat4* modelMatrices;
+    modelMatrices = new glm::mat4[amount];
+    std::srand(time(NULL));
 
-    // World setup
-    // Query user for number of spheres
-    int numSpheres;
-    numSpheres = 1;
-     std::cout << "How many spheres would you like to render?" << std::endl;
-     std::cout << "Number of spheres: ";
-     std::cin >> numSpheres;
-     std::string line;
-     std::string component;
+    for(int i = 0; i < amount; i++) {
+        glm::mat4 model = glm::mat4(1.0f);
 
-    // Setup instanced array for instanced drawing
-    glm::vec3 position;
-    glm::vec3* positions;
-    positions = new glm::vec3[numSpheres];
+        // 1. Translate to random position
+        float x =  -3 + (3 + 3) * (std::rand() / (RAND_MAX + 1.0));
+        float y =  -3 + (3 + 3) * (std::rand() / (RAND_MAX + 1.0));
+        model = glm::translate(model, glm::vec3(x, y, -10));
 
-    std::cout << "For each sphere, enter an x, y, and z to set its position in space" << std::endl;
-    std::cout << "Enter each position in the following format - x, y, z" << std::endl;
-    for (int i = 0; i < numSpheres; i++) {
-        std::cin.ignore(1000, '\n');
-        std::cout << "Sphere " << i << ": ";
-        std::getline(std::cin, line);
-        std::stringstream ss (line);
-        std::getline(ss, component, ',');
-        position.x = std::stoi(component);
-        std::getline(ss, component, ',');
-        position.y = std::stoi(component);
-        std::getline(ss, component, ',');
-        position.z = std::stoi(component);
-        positions[i] = position;
+        // 2. Scale randomly
+        float scale = 0.5 + (1 - 0.5) * (std::rand() / (RAND_MAX + 1.0));
+        model = glm::scale(model, glm::vec3(scale));
+
+        // 3. Add to list of matrices
+        modelMatrices[i] = model;
+        
     }
 
-    for (int i = 0; i < numSpheres; i++) {
-        world.add(make_shared<sphere>(vec3(positions[i].x, 
-                                           positions[i].y, 
-                                           positions[i].z), 0.5));
-    }
-
-    myModel.SetInstancedDraw(numSpheres, positions);
+    myModel.SetInstancedDraw(amount, modelMatrices);
     
     // Create uniform buffer for matrices in vertex shader (Both normalShader and lightShader use all three matrices)
     // Create buffer and generate ID
@@ -127,12 +105,14 @@ int main() {
     glGenBuffers(1, &UBO);
 
     // Get Uniform block location
-    unsigned int normalBlockIdx = glGetUniformBlockIndex(normalShader.ID, "Matrices");
-    unsigned int lightBlockIdx = glGetUniformBlockIndex(lightShader.ID, "Matrices");
+    // unsigned int normalBlockIdx = glGetUniformBlockIndex(normalShader.ID, "Matrices");
+    // unsigned int lightBlockIdx = glGetUniformBlockIndex(lightShader.ID, "Matrices");
+    unsigned int testBlockIdx = glGetUniformBlockIndex(testShader.ID, "Matrices");
 
     // Bind each shaders uniform block to the binding point 0
-    glUniformBlockBinding(normalShader.ID, normalBlockIdx, 0);
-    glUniformBlockBinding(lightShader.ID, lightBlockIdx, 0);
+    // glUniformBlockBinding(normalShader.ID, normalBlockIdx, 0);
+    // glUniformBlockBinding(lightShader.ID, lightBlockIdx, 0);
+    glUniformBlockBinding(testShader.ID, testBlockIdx, 0);
 
     // Bind UBO and reserve space for 3 4x4 matrices in the uniform buffer object
     glBindBuffer(GL_UNIFORM_BUFFER, UBO);
@@ -144,9 +124,6 @@ int main() {
 
     // Depth testing
     glEnable(GL_DEPTH_TEST);
-
-    // Light setup
-    glm::vec3 lightPos = glm::vec3(1.0f, 1.0f, 2.0f);
     
     // Render loop
     while (!glfwWindowShouldClose(window)) {
@@ -162,7 +139,7 @@ int main() {
 
         // Camera
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, 0.0f));
 
         // Projection
         glm::mat4 projection = glm::mat4(1.0f);
@@ -176,16 +153,8 @@ int main() {
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
         // Draw vertices
-        lightShader.use();
-        
-        // Pass the light's position
-        int lightPosLoc = glGetUniformLocation(lightShader.ID, "vsLightPos");
-        glUniform3fv(lightPosLoc, 1, glm::value_ptr(lightPos));
-
-        myModel.InstancedDraw(numSpheres);
-
-        // normalShader.use();
-        // myModel.Draw();
+        testShader.use();
+        myModel.InstancedDraw(amount);
 
         glfwSwapBuffers(window); // Swap front and back buffer
 
@@ -219,7 +188,7 @@ void key_callback(GLFWwindow *MyWindow, int key, int scancode, int action, int m
     }
 
     if(key == GLFW_KEY_A && action == GLFW_PRESS) {
-        myCamera.render(world);
+        //myCamera.render(world);
     }
 
 }

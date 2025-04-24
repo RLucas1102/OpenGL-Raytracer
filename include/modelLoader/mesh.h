@@ -84,7 +84,7 @@ class Mesh {
 
         }
 
-        void setInstancedDraw(int numObjects, const glm::vec3* positions) {
+        void setInstancedDraw(int numObjects, const glm::mat4* modelMatrices) {
 
             // Bind VAO
             glBindVertexArray(_VAO);
@@ -92,13 +92,25 @@ class Mesh {
             // Generate ID for VBO and load instance data
             glGenBuffers(1, &_instanceVBO);
             glBindBuffer(GL_ARRAY_BUFFER, _instanceVBO);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * numObjects, &positions[0], GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * numObjects, &modelMatrices[0], GL_STATIC_DRAW);
 
             // Instance Attribute
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0); // Start at 0 offset because new VBO
+            std::size_t v4s = sizeof(glm::vec4);
+            glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * v4s, (void*)0); // Start at 0 offset because new VBO
             glEnableVertexAttribArray(1);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * v4s, (void*)(1 * v4s)); // Start at 0 offset because new VBO
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * v4s, (void*)(2 * v4s)); // Start at 0 offset because new VBO
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * v4s, (void*)(3 * v4s)); // Start at 0 offset because new VBO
+            glEnableVertexAttribArray(4);
+
             glVertexAttribDivisor(1, 1); // OpenGL now knows this an instanced vertex attribute. 1 means Change value every instance
+            glVertexAttribDivisor(2, 1); // OpenGL now knows this an instanced vertex attribute. 1 means Change value every instance
+            glVertexAttribDivisor(3, 1); // OpenGL now knows this an instanced vertex attribute. 1 means Change value every instance
+            glVertexAttribDivisor(4, 1); // OpenGL now knows this an instanced vertex attribute. 1 means Change value every instance
+
+            glBindVertexArray(0);
 
         }
 

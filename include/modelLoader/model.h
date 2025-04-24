@@ -84,9 +84,9 @@ class Model {
             
         }
 
-        void SetInstancedDraw(int numObjects, const glm::vec3* positions) {
+        void SetInstancedDraw(int numObjects, const glm::mat4* modelMatrices) {
             for (int i = 0; i < _meshes.size(); i++) {
-                _meshes[i].setInstancedDraw(numObjects, positions);
+                _meshes[i].setInstancedDraw(numObjects, modelMatrices);
             }
             
         }
