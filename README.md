@@ -1,2 +1,2 @@
 # OpenGL-Raytracer
-A repository to archive all graphics projects that were created in CSCI471
+OpenGL renderer combined with a raytracer to visualize scenes and output images
